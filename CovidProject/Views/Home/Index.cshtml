@@ -1,0 +1,76 @@
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js" ></script>
+
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	</head>
+<div class="text-center w3-bar">
+    <h1 class="display-4">Welcome</h1>
+
+	@Html.DropDownListFor(vm => vm.listItems, Model.listItems, new { id = "areaSelector"})
+
+
+    <canvas max-height="400" width="400" id="graphCanvas"></canvas>
+</div>
+
+
+<script>
+	var ctx = $("#graphCanvas");
+	$("#areaSelector").bind("change", function () {
+		debugger;
+		getData($("#areaSelector").val());
+	});
+	var CHART = new Chart(ctx, {
+		// The type of chart we want to create
+		type: 'line',
+        responsive: true,		// The data for our dataset
+		data: {
+			datasets: [{
+				label: 'Results',
+				backgroundColor: 'rgb(255, 99, 132)',
+				borderColor: 'rgb(255, 99, 132)',
+				data: [],
+				maxTicksLimit: 1000000
+			}]
+		},
+
+		// Configuration options go here
+		options: {}
+		});
+
+	function getData(state) {
+		$.ajax({
+			type: "GET",
+			url: "Home/Chart",
+			data: { country: state },
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function (response) {
+
+				chart(response);
+
+			},
+			error: function () { alert("you are a failure") }
+            });
+
+			
+	};
+	function chart(data) {
+		debugger;
+		CHART.data.labels = data.labels;
+		CHART.data.datasets[0].data = data.totals;
+		CHART.update();
+	};
+
+
+
+	
+</script>
